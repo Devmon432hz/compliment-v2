@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "../Button";
 import { MoveRight } from "lucide-react";
 
@@ -10,7 +10,9 @@ const Card = ({ text, isOpen, onClick }) => {
             onClick={onClick}
         >
             <motion.div
-                className="w-full h-full relative"
+                className={`w-full h-full relative rounded-xl ${
+                    isOpen ? "shadow-[0_0_30px_rgba(244,63,94,0.6)]" : ""
+                }`}
                 animate={{ rotateY: isOpen ? 180 : 0 }}
                 transition={{ duration: 0.8, ease: "easeInOut" }}
                 style={{ transformStyle: "preserve-3d" }}
@@ -25,7 +27,7 @@ const Card = ({ text, isOpen, onClick }) => {
 
                 {/* Back */}
                 <div
-                    className="absolute inset-0 bg-white p-4 shadow-xl flex flex-col justify-center text-center border-2 border-rose-200 rounded-xl"
+                    className="absolute inset-0 bg-white p-4 shadow-xl flex items-center justify-center text-center border-2 border-rose-200 rounded-xl"
                     style={{
                         transform: "rotateY(180deg)",
                         backfaceVisibility: "hidden",
@@ -42,8 +44,8 @@ const Card = ({ text, isOpen, onClick }) => {
 
 export default function ComplimentsScreen({ onNext }) {
 
-    // store multiple opened cards
     const [openCards, setOpenCards] = useState([]);
+    const audioRef = useRef(null);
 
     const compliments = [
         "Being around you makes even ordinary days feel special.",
@@ -52,9 +54,14 @@ export default function ComplimentsScreen({ onNext }) {
     ];
 
     const handleOpen = (index) => {
-        // only allow next card to open in sequence
-        if (index === openCards.length) {
+        if (!openCards.includes(index)) {
             setOpenCards([...openCards, index]);
+
+            // Play sound
+            if (audioRef.current) {
+                audioRef.current.currentTime = 0;
+                audioRef.current.play();
+            }
         }
     };
 
@@ -68,23 +75,14 @@ export default function ComplimentsScreen({ onNext }) {
                 My favorite things about you
             </h2>
 
-            <div className="relative w-full max-w-md h-96 flex items-center justify-center gap-6">
+            <div className="flex gap-6 flex-wrap justify-center">
                 {compliments.map((text, index) => (
-                    <motion.div
+                    <Card
                         key={index}
-                        initial={{ opacity: 0, y: 40 }}
-                        animate={{
-                            opacity: index <= openCards.length ? 1 : 0,
-                            y: index <= openCards.length ? 0 : 40
-                        }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <Card
-                            text={text}
-                            isOpen={openCards.includes(index)}
-                            onClick={() => handleOpen(index)}
-                        />
-                    </motion.div>
+                        text={text}
+                        isOpen={openCards.includes(index)}
+                        onClick={() => handleOpen(index)}
+                    />
                 ))}
             </div>
 
@@ -94,6 +92,9 @@ export default function ComplimentsScreen({ onNext }) {
             >
                 One more thing <MoveRight size={18} className="mt-0.5" />
             </Button>
+
+            {/* Audio Element */}
+            <audio ref={audioRef} src="/sounds/flip.mp3" />
         </motion.div>
     );
 }
