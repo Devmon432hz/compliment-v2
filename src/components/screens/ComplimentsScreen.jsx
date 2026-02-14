@@ -1,22 +1,39 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { Button } from "../Button";
 import { MoveRight } from "lucide-react";
 
-const Card = ({ text }) => {
-
+const Card = ({ text, isOpen, onClick }) => {
     return (
         <div
-            className="relative w-40 h-48"
+            className="relative w-40 h-48 cursor-pointer"
+            onClick={onClick}
         >
             <motion.div
-                className="w-full h-full preserve-3d relative will-change-transform"
+                className="w-full h-full relative"
+                animate={{ rotateY: isOpen ? 180 : 0 }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+                style={{ transformStyle: "preserve-3d" }}
             >
+                {/* Front Side */}
                 <div
-                    className="absolute inset-0 backface-hidden bg-white p-4 shadow-xl flex flex-col justify-center text-center border-2 border-rose-100 overflow-hiden"
+                    className="absolute inset-0 bg-rose-100 flex items-center justify-center text-rose-600 font-semibold rounded-xl shadow-xl"
+                    style={{ backfaceVisibility: "hidden" }}
                 >
-                    <div className="h-36 overflow-auto flex items-start">
-                        <p className="text-sm text-gray-700 font-medium leading-relaxed my-auto">{text}</p>
-                    </div>
+                    Tap to open 💌
+                </div>
+
+                {/* Back Side */}
+                <div
+                    className="absolute inset-0 bg-white p-4 shadow-xl flex flex-col justify-center text-center border-2 border-rose-200 rounded-xl"
+                    style={{
+                        transform: "rotateY(180deg)",
+                        backfaceVisibility: "hidden",
+                    }}
+                >
+                    <p className="text-sm text-gray-700 font-medium leading-relaxed">
+                        {text}
+                    </p>
                 </div>
             </motion.div>
         </div>
@@ -24,32 +41,46 @@ const Card = ({ text }) => {
 };
 
 export default function ComplimentsScreen({ onNext }) {
+    const [openIndex, setOpenIndex] = useState(-1);
+
+    const compliments = [
+        "Being around you makes even ordinary days feel special.",
+        "I love how your eyes light up when you talk about things you love.",
+        "Your laugh is literally my favorite sound in the entire universe. Never stop."
+    ];
+
     return (
         <motion.div
             className="flex flex-col items-center justify-center w-full"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
         >
-            <h2 className="text-4xl md:text-5xl text-balance font-dancing font-semibold text-rose-500/85 mb-12 z-10 text-center">
+            <h2 className="text-4xl md:text-5xl font-dancing font-semibold text-rose-500/85 mb-12 text-center">
                 My favorite things about you
             </h2>
 
-            <div className="relative w-full max-w-md h-96 flex items-center justify-center">
-                <div className="absolute top-0 max-[366px]:left-0 left-3 md:left-14 z-10 -rotate-6">
-                    <Card
-                        text="Being around you makes even ordinary days feel special."
-                    />
-                </div>
-                <div className="absolute top-3 md:top-4 max-[366px]:right-0 right-4 md:right-14 z-20 rotate-12">
-                    <Card
-                        text="I love how your eyes light up when you talk about things you love."
-                    />
-                </div>
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 -rotate-2">
-                    <Card
-                        text="Your laugh is literally my favorite sound in the entire universe. Never stop."
-                    />
-                </div>
+            <div className="relative w-full max-w-md h-96 flex items-center justify-center gap-6">
+                {compliments.map((text, index) => (
+                    <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{
+                            opacity: openIndex >= index - 1 ? 1 : 0,
+                            y: openIndex >= index - 1 ? 0 : 40
+                        }}
+                        transition={{ duration: 0.6, delay: index * 0.4 }}
+                    >
+                        <Card
+                            text={text}
+                            isOpen={openIndex === index}
+                            onClick={() => {
+                                if (index === openIndex + 1) {
+                                    setOpenIndex(index);
+                                }
+                            }}
+                        />
+                    </motion.div>
+                ))}
             </div>
 
             <Button
@@ -60,4 +91,4 @@ export default function ComplimentsScreen({ onNext }) {
             </Button>
         </motion.div>
     );
-};
+}
