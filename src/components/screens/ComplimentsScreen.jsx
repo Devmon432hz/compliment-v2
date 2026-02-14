@@ -15,7 +15,7 @@ const Card = ({ text, isOpen, onClick }) => {
                 transition={{ duration: 0.8, ease: "easeInOut" }}
                 style={{ transformStyle: "preserve-3d" }}
             >
-                {/* Front Side */}
+                {/* Front */}
                 <div
                     className="absolute inset-0 bg-rose-100 flex items-center justify-center text-rose-600 font-semibold rounded-xl shadow-xl"
                     style={{ backfaceVisibility: "hidden" }}
@@ -23,9 +23,9 @@ const Card = ({ text, isOpen, onClick }) => {
                     Tap to open 💌
                 </div>
 
-                {/* Back Side */}
+                {/* Back */}
                 <div
-                    className="absolute inset-0 bg-white p-4 shadow-xl flex flex-col justify-center text-center border-2 border-rose-200 rounded-xl"
+                    className="absolute inset-0 bg-white p-4 shadow-xl flex items-center justify-center text-center border-2 border-rose-200 rounded-xl"
                     style={{
                         transform: "rotateY(180deg)",
                         backfaceVisibility: "hidden",
@@ -41,13 +41,22 @@ const Card = ({ text, isOpen, onClick }) => {
 };
 
 export default function ComplimentsScreen({ onNext }) {
-    const [openIndex, setOpenIndex] = useState(-1);
+
+    // 🔥 store multiple open cards
+    const [openCards, setOpenCards] = useState([]);
 
     const compliments = [
         "Being around you makes even ordinary days feel special.",
         "I love how your eyes light up when you talk about things you love.",
         "Your laugh is literally my favorite sound in the entire universe. Never stop."
     ];
+
+    const handleOpen = (index) => {
+        // if not already open → open it
+        if (!openCards.includes(index)) {
+            setOpenCards([...openCards, index]);
+        }
+    };
 
     return (
         <motion.div
@@ -59,27 +68,15 @@ export default function ComplimentsScreen({ onNext }) {
                 My favorite things about you
             </h2>
 
-            <div className="relative w-full max-w-md h-96 flex items-center justify-center gap-6">
+            {/* All cards visible immediately */}
+            <div className="flex gap-6 flex-wrap justify-center">
                 {compliments.map((text, index) => (
-                    <motion.div
+                    <Card
                         key={index}
-                        initial={{ opacity: 0, y: 40 }}
-                        animate={{
-                            opacity: openIndex >= index - 1 ? 1 : 0,
-                            y: openIndex >= index - 1 ? 0 : 40
-                        }}
-                        transition={{ duration: 0.6, delay: index * 0.4 }}
-                    >
-                        <Card
-                            text={text}
-                            isOpen={openIndex === index}
-                            onClick={() => {
-                                if (index === openIndex + 1) {
-                                    setOpenIndex(index);
-                                }
-                            }}
-                        />
-                    </motion.div>
+                        text={text}
+                        isOpen={openCards.includes(index)}
+                        onClick={() => handleOpen(index)}
+                    />
                 ))}
             </div>
 
