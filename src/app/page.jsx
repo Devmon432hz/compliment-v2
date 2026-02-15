@@ -16,8 +16,9 @@ export default function Home() {
     <MessageScreen key="message" onNext={() => setCurrentScreen(3)} />,
     <OutroScreen key="outro" />
   ]
+
   return (
-    <div className="min-h-screen flex items-center justify-center overflow-hidden" >
+    <div className="min-h-screen flex items-center justify-center overflow-hidden">
 
       <AnimatePresence mode="wait">
         <motion.div
@@ -32,16 +33,6 @@ export default function Home() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Watermark */}
-      <motion.div
-        initial={{ x: 100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{
-          duration: 1,
-        }}
-        className="fixed bottom-4 right-4 text-sm text-black/40 pointer-events-none z-50 font-light">
-        @anujbuilds
-      </motion.div>
-    </div >
+    </div>
   );
 }
